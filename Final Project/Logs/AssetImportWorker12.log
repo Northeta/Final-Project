@@ -9,11 +9,11 @@ C:\Program Files\Unity\Hub\Editor\2021.3.6f1\Editor\Unity.exe
 -batchMode
 -noUpm
 -name
-AssetImportWorker8
+AssetImportWorker12
 -projectPath
 C:/Final-Project/Final Project
 -logFile
-Logs/AssetImportWorker8.log
+Logs/AssetImportWorker12.log
 -srvPort
 60329
 Successfully changed project path to: C:/Final-Project/Final Project
