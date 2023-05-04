@@ -4,7 +4,8 @@ Shader "Unlit/Pencil"
     {
         _MainTex ("Texture", 2D) = "white" {}
         _GradThresh ("Gradiant threshold", range(0.000001, 0.01)) = 0.01
-        //_ColorThreshold ("Color Threshold", range(0.0, 1)) = 0.5
+        _farColor ("Color Edge", range(0.1, 1.0)) = 1.0
+        _invert("Invert", range(0, 1)) = 0
     }
     SubShader
     {
@@ -19,10 +20,13 @@ Shader "Unlit/Pencil"
             #include "UnityCG.cginc"
  
             sampler2D _MainTex;
- 
+
+            float depth;
             float _GradThresh;
             float _ColorThreshold;
             float _Intensity;
+            float _farColor;
+            bool _invert;
  
             struct v2f {
                 float4 pos : SV_POSITION;
@@ -71,7 +75,15 @@ Shader "Unlit/Pencil"
             fixed4 frag(v2f i) : SV_Target
             {
                 float2 screenuv = i.screenuv.xy / i.screenuv.w;
-                float depth = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, screenuv))*2;
+                if (!_invert)
+                {
+                    depth = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, screenuv))*2;
+                }
+                else
+                {
+                    depth = 1-Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, screenuv))*2;
+                }
+                
                 if (depth > 1.5)
                 {
                     depth = 1-depth;
@@ -80,7 +92,7 @@ Shader "Unlit/Pencil"
                         depth = 0;
                     }
                 }
-                else if(depth > 0.3) {
+                else if(depth > _farColor) {
                     depth = 1;
                 }
                 float2 screenPos = float2(i.screenuv.x * _ScreenParams.x, i.screenuv.y * _ScreenParams.y);
